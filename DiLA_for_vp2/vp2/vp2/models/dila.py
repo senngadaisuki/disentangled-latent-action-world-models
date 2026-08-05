@@ -21,9 +21,6 @@ class DiLAModel(nn.Module):
                  epoch=None,
                  n_past=2,
                  device='cuda'):
-        """
-        初始化函数：参数对应 Config 文件中的配置项
-        """
         super().__init__()
         self.device = device
         
@@ -40,9 +37,6 @@ class DiLAModel(nn.Module):
         self.requires_grad_(False)
 
     def _init_components(self, depth, model_ckpt, la_enc_ckpt):
-        """
-        将原本零散的初始化逻辑封装在此
-        """
         # --- RAE Initialization ---
         patch_nums = (1, 2, 3, 4, 5, 6, 8, 10, 13, 16)
         dinov2_root = (
@@ -136,7 +130,6 @@ class DiLAModel(nn.Module):
     @torch.no_grad()
     def __call__(self, batch, n_context=None, planning_horizon=None, grad_enabled=False):
         """
-        框架要求的标准接口
         Input: {'video': (B, T, C, H, W)∈[0, 1], 'actions': (B, T, A)∈[-1, 1]}
         Output: {'rgb': (B, T+n_pred, C, H, W)∈[0, 1]}
 
