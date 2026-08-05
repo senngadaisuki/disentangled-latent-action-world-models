@@ -6,9 +6,9 @@ import sys
 import os
 import numpy as np
 
-from dila_model.models.model import STTransformer, Separate_Fusion, Inverse_World_model
-from dila_model.models.RAE.rae import RAE
-from dila_model.models.modules.action_decoder import ActionMLP
+from .....models.model import STTransformer, Separate_Fusion, Inverse_World_model
+from .....models.RAE.rae import RAE
+from .....models.modules.action_decoder import ActionMLP
 
 class DiLAModel(nn.Module):
     def __init__(self, 
@@ -27,7 +27,6 @@ class DiLAModel(nn.Module):
         super().__init__()
         self.device = device
         
-        # 1. 初始化并加载子模型
         self.action_dim = action_dim
         self.rae, self.world_model, self.latent_action_encoder = self._init_components(
             model_depth, world_model_ckpt_path, la_enc_ckpt_path
@@ -36,7 +35,6 @@ class DiLAModel(nn.Module):
         self.num_context = n_past
         self.planning_horizon = planning_horizon
         self.base_prediction_modality = "rgb"
-        # 2. 设置为评估模式并冻结参数
         self.to(device)
         self.eval()
         self.requires_grad_(False)
@@ -46,10 +44,9 @@ class DiLAModel(nn.Module):
         将原本零散的初始化逻辑封装在此
         """
         # --- RAE Initialization ---
-        # 如果需要下载逻辑，可以保留在这里
         patch_nums = (1, 2, 3, 4, 5, 6, 8, 10, 13, 16)
         dinov2_root = (
-            "path/to/dinov2"  # 替换为实际的 Dinov2 模型路径
+            "path/to/dinov2" # replace with actual path to Dinov2 model weights
         )
 
         rae = RAE(
@@ -58,12 +55,12 @@ class DiLAModel(nn.Module):
         encoder_input_size=224,
         encoder_params={"dinov2_path": dinov2_root,
                         "normalize": True},
-        decoder_config_path="path/to/decoder/config",  # 替换为实际的解码器配置路径
+        decoder_config_path="path/to/decoder/config",  # replace with actual path to decoder config
         decoder_patch_size=16,
-        pretrained_decoder_path="path/to/pretrained/decoder",  # 替换为实际的预训练解码器权重路径
+        pretrained_decoder_path="path/to/pretrained/decoder",  # replace with actual path to pretrained decoder
         reshape_to_2d=True,
         noise_tau=0.0,
-        normalization_stat_path="path/to/normalization/stat",  # 替换为实际的归一化统计路径
+        normalization_stat_path="path/to/normalization/stat",  # replace with actual path to normalization stat
             )
         rae.eval()
         rae.to(self.device)
@@ -118,17 +115,9 @@ class DiLAModel(nn.Module):
         Returns:
             resized_tensor: (B, T, C, new_H, new_W)
         """
-        # 1. 合并 B 和 T 维度 -> (B*T, C, H, W)
-        # 这样就符合 interpolate 的输入要求了
         x_flat = rearrange(video_tensor, 'b t c h w -> (b t) c h w')
-        
-        # 2. 执行 Resize
-        # mode='bilinear' (双线性插值) 是图像最常用的，align_corners=False 是默认推荐
-        # 如果是 mask (分割图)，通常用 mode='nearest'
         x_resized = F.interpolate(x_flat, size=size, mode='bilinear', align_corners=False)
         
-        # 3. 恢复维度 -> (B, T, C, new_H, new_W)
-        # 注意：这里需要知道原始的 B，或者让 einops 自动推断
         b = video_tensor.shape[0]
         x_final = rearrange(x_resized, '(b t) c h w -> b t c h w', b=b)
         
@@ -153,10 +142,10 @@ class DiLAModel(nn.Module):
 
         [DEBUG] batch keys: ['video', 'actions', 'state_obs']
         [DEBUG] batch['video'] shape: (200, 2, 64, 64, 3)
-        [DEBUG] batch['actions'] shape: (200, 11, 5) context和pred的action都传进来
+        [DEBUG] batch['actions'] shape: (200, 11, 5)
         [DEBUG] base_preds shape: (200, 11, 3, 64, 64)
         [DEBUG] preds keys after base: ['rgb']
-        [DEBUG] preds[rgb] shape: (200, 11, 64, 64, 3) 这个pred不是只pred了未来的，是把context也预测了，和具体模型有关。我们可以只去最后的pred
+        [DEBUG] preds[rgb] shape: (200, 11, 64, 64, 3)
 
         """
         if n_context is None:
