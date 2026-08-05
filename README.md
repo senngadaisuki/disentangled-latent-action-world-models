@@ -390,6 +390,34 @@ accelerate launch main.py \
   exp_name=DiLA-vp2-robodesk-finetune
 ```
 
+We can now employ the fine-tuned model for VP<sup>2</sup> planning. To begin, configure the following paths:
+
+1. **RAE initialization checkpoint**
+
+   Set the RAE initialization path in:
+
+   [`DiLA_for_vp2/vp2/vp2/models/dila.py`](DiLA_for_vp2/vp2/vp2/models/dila.py)
+
+2. **World model checkpoint**
+
+   Replace `/path/to/world_model_checkpoint.pth` with the path to the fine-tuned
+   DiLA world model checkpoint in:
+
+   [`DiLA_for_vp2/vp2/vp2/scripts/configs/model/dila.yaml`](DiLA_for_vp2/vp2/vp2/scripts/configs/model/dila.yaml)
+
+3. **Goal dataset**
+
+   Configure the path to the corresponding goal dataset for both RoboDesk and
+   RoboSuite in the environment configuration files under:
+
+   [`DiLA_for_vp2/vp2/vp2/scripts/configs/env`](DiLA_for_vp2/vp2/vp2/scripts/configs/env)
+
+After configuring these paths, run planning with:
+
+```bash
+bash DiLA_for_vp2/vp2/vp2/run_plan.sh
+```
+
 See Appendix D of the paper for the full protocol, including the number of
 adaptation trajectories, fine-tuning data, and MPC/MPPI planning settings.
 
