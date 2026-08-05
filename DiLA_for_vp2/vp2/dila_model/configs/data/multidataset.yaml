@@ -1,0 +1,175 @@
+# Multi-dataset configuration for mixed training
+# Use with: accelerate launch main.py data=multidataset
+
+use_multidataset: true
+
+# Single dataset params (kept for compatibility, not used when use_multidataset=true)
+root_dir: "./data/ssv2/rawframes"
+train_file: "./data/ssv2/labels/train.json"
+val_file: "./data/ssv2/labels/validation.json"
+frames_per_clip: 8
+sliding_window: 8
+sample_downsample_rate: 1
+num_workers: 8
+
+# Multi-dataset configuration
+multidataset:
+  # List of datasets to use (supported: procgen games, ssv2, openx, nwm, loopnav)
+  dataset_names:
+    # - procgen
+    - ssv2
+    - openx
+    - nwm
+    - loopnav
+    # - memorymaze
+
+  # Sampling ratios for each dataset (order must match dataset_names)
+  # ratios: [procgen, ssv2, openx, nwm, loopnav]
+  # ratios: [10, 6, 6, 5, 5]
+  ratios: [1, 1, 1, 1]
+
+  # Training parameters
+  batch_size: ${batch_size}
+  val_batch_size: ${val_batch_size}
+  seq_len: ${seq_len}
+  num_workers: ${num_workers}
+  pin_memory: ${pin_memory}
+  shuffle_train: ${shuffle_train}
+  seed: ${seed}
+
+  # ── DMC Vision Benchmark streaming path ──────────────────────────────────
+  # Set use_dmc_streaming: true to activate a dedicated DataLoader path that
+  # uses DMCVisionDataset (IterableDataset) via torch.utils.data.ChainDataset.
+  # This is SEPARATE from the MixedDataset path above.
+  # When enabled, dmc_domains defines one entry per domain to train on.
+  # The rest of the MixedDataset config (dataset_names / ratios) is ignored.
+  use_dmc_streaming: false
+  dmc_domains:
+    - domain_name: walker
+      data_dir: ./data/dmc_vision_benchmark
+      policy_level: expert        # expert | medium | expert_medium
+      difficulty: medium          # none | easy | medium | hard
+      dynamic_distractors: true  # true = moving distractors
+      img_height: 64
+      img_width: 64
+      obs_vrange: [0.0, 1.0]
+      stride: ${seq_len}                  # = seq_len → non-overlapping; set 1 for dense
+      shuffle_buffer_size: 500
+      max_samples: null
+      train_split: train
+      val_split: train
+    - domain_name: cheetah
+      data_dir: ./data/dmc_vision_benchmark
+      policy_level: expert
+      difficulty: medium
+      dynamic_distractors: true
+      img_height: 64
+      img_width: 64
+      obs_vrange: [0.0, 1.0]
+      stride: ${seq_len}
+      shuffle_buffer_size: 500
+      max_samples: null
+      train_split: train
+      val_split: train
+    - domain_name: humanoid
+      data_dir: ./data/dmc_vision_benchmark
+      policy_level: expert
+      difficulty: medium
+      dynamic_distractors: true
+      img_height: 64
+      img_width: 64
+      obs_vrange: [0.0, 1.0]
+      stride: ${seq_len}
+      shuffle_buffer_size: 500
+      max_samples: null
+      train_split: train
+      val_split: train
+
+  # ProcGen games configuration
+  procgen:
+    dataset_names:
+      - miner
+      - maze
+      - caveflyer
+      - chaser
+      - climber
+      - coinrun
+      - dodgeball
+      - fruitbot
+      - heist
+      - jumper
+    data_dir: ./data/procgen/expert_data
+    split_ratio: 0.8
+    seed: ${seed}
+    return_goal: true
+    cache_metadata: false
+
+  # SSV2 (Something-Something-V2) configuration
+  ssv2:
+    data_dir: ./data/ssv2/rawframes
+    train_file: ./data/ssv2/labels/training-clean.json
+    val_file: ./data/ssv2/labels/validation-clean.json
+    frames_per_clip: 16
+    sample_downsample_rate: 1
+
+  # OpenX-Embodiment configuration (processed folder+frames format)
+  openx:
+    data_dir: ./data/rt1
+    frame_skip: 2
+    dataset_names:
+      - fractal20220817_data
+    max_episodes_per_dataset: null
+    train_ratio: 0.9
+    seed: ${seed}
+    return_instruction: false
+
+  # NWM (Navigation with Memory) configuration
+  nwm:
+    data_dir: ./data/recon/data
+    data_split_folder: ./data/recon/data_splits
+    dataset_name: recon
+    min_dist_cat: 3
+    max_dist_cat: 10
+    traj_names: traj_names.txt
+    normalize: true
+    predefined_index: null
+    goals_per_obs: 1
+
+  # LoopNav (Minecraft navigation) configuration
+  loopnav:
+    data_dir: ./data/loopnav_frames
+    split_ratio: 0.8
+    seed: ${seed}
+    return_goal: false
+    cache_metadata: false
+
+  # Memory Maze configuration
+  memorymaze:
+    data_dir: ./data/memory-maze-15x15_frames
+    split_ratio: 0.8
+    seed: ${seed}
+    return_goal: false
+    return_state: false
+    cache_metadata: false
+
+
+  # DMC Vision Benchmark (DMC-VB) configuration
+  # Data must be in RLDS/TFDS format (as downloaded from the original DMC-VB repo).
+  # Supported domains: walker, cheetah, humanoid, ant
+  # To enable: add 'dmc_vision' to dataset_names and append a ratio.
+  # dmc_vision:
+  #   data_dir: ./data/dmc_vb
+  #   domain_name: walker
+  #   task_name: null
+  #   policy_level: expert
+  #   difficulty: none
+  #   dynamic_distractors: false
+  #   img_height: 64
+  #   img_width: 64
+  #   obs_vrange: [0.0, 1.0]
+  #   target_hidden: false
+  #   ant_fixed_seed: null
+  #   max_samples: null
+  #   stride: null
+  #   train_split: train
+  #   val_split: test

@@ -1,0 +1,4 @@
+# Action Decoder Configuration
+_target_: models.modules.action_decoder.ActionMLP
+num_actions: 4  # 4 for robosuite, 5 for robodesk
+action_dim: 256

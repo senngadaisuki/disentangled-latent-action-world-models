@@ -227,3 +227,5 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+/DiLA_for_vp2/vp2/iGibson/

@@ -1,0 +1,16 @@
+# Spatio-temporal structure encoder configuration
+_target_: models.model.STTransformer
+Embedding_dim: 768
+channels: 768
+H: 16
+W: 16
+patch_size: 1
+spatial_depth: 4
+temporal_depth: 4
+dim_head: 64
+heads: 8
+batch_first: ${batch_first}
+
+# sensory_inf_loss: 1.0
+# covariance_loss: 0.0
+# variance_loss: 0.0

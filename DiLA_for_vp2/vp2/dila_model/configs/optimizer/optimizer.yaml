@@ -1,0 +1,5 @@
+inverse_lr: 1e-4
+world_lr: 1e-4
+weight_decay: 1e-5
+betas: [0.9, 0.999]
+T_max: 100

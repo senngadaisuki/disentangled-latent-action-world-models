@@ -1,0 +1,16 @@
+# Separate content/structure fusion configuration
+_target_: models.model.Separate_Fusion
+Embedding_dim: ${structure_encoder.Embedding_dim}
+Structure_dim: 32 #64 -> 32 (Decreased for dynamics capacity)
+content_dim: 256 #128 -> 64 (Decreased to force identity-only encoding)
+patch_size: 1
+spatial_depth: 3
+# temporal_depth: 4
+dim_head: 32
+heads: 8
+ssm_depth: 2
+ssm_d_state: 32
+ssm_d_conv: 4
+ssm_expand: 2
+ssm_dropout: 0.0
+batch_first: ${batch_first}

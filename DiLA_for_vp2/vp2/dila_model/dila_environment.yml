@@ -1,0 +1,27 @@
+name: dila
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch>=2.1
+  - torchvision
+  - pytorch-cuda=12.1
+  - numpy
+  - pillow
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - pip:
+      - accelerate
+      - hydra-core
+      - omegaconf
+      - einops
+      - beartype
+      - wandb
+      - transformers
+      - huggingface_hub
+      - jupyter
+      - ipykernel

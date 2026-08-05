@@ -1,0 +1,9 @@
+_target_: vp2.models.dila.DiLAModel
+world_model_ckpt_path: /path/to/world_model_checkpoint.pth  # 替换为实际的世界模型检查点路径
+la_enc_ckpt_path: None
+n_context: ${n_context}
+planning_horizon: ${planning_horizon}
+model_depth: 16
+action_dim: ${env.a_dim}
+epoch: null
+n_past: 2

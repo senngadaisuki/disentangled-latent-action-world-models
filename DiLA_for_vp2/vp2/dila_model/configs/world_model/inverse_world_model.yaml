@@ -1,0 +1,36 @@
+# Inverse World Model Configuration
+_target_: models.model.Inverse_World_model
+
+Embedding_dim: ${structure_encoder.Embedding_dim}
+Structure_dim: ${content_fusion.Structure_dim}
+Action_dim: 256
+# channels: 768
+# H: 16
+# W: 16
+patch_size: 16
+dim_head: 32
+heads: 8
+hidden_dim: 256
+depth: 4
+batch_first: ${batch_first}
+phase: ${phase}
+
+# codebook_size: 8
+# quant_dim: 32
+# discarding_threshold: 0.1
+# max_codebook_update_step: 10000
+
+sensory_gen_loss: 2.
+
+grid_loss: 0.03
+action_loss: 0.03
+# action_loss: 1e-4
+
+content_consistency_loss: 0.01
+mutual_info_loss: 0.1
+
+covariance_loss: 0.01
+variance_loss: 0.03
+
+symmetry_loss: 0.001
+l2_loss: 0.001

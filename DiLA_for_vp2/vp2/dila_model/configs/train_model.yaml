@@ -1,0 +1,61 @@
+defaults:
+  - _self_
+  - structure_encoder: st_transformer
+  - content_fusion: separate_fusion
+  - world_model: inverse_world_model
+  - decoder: action
+  - data: multidataset
+  - optimizer: optimizer
+
+# General training parameters
+batch_size: 4
+val_batch_size: 4
+seq_len: 16
+num_workers: 4
+pin_memory: True
+shuffle_train: True
+
+phase: 1
+exp_name: "DiLA_g_16_la_256"
+grad_accum_every: 1
+num_train_steps: 3_000
+# num_train_steps: 1000
+max_grad_norm: 6.0
+save_model_every: 10_000
+save_milestone_every: 10_000
+val_every_n_steps: 10_000
+num_val_batches_to_log: 4
+num_val_samples_to_save: 6
+milestone_optim_state: True
+batch_first: True
+seed: 42
+work_dir: "./checkpoints"
+
+# WandB logging
+wandb:
+  enabled: true
+  project: "Abstract Relations"
+  name: "Mixed-dataset-phase${phase}" # Hydra variable substitution
+
+RAE:
+  encoder_cls: "Dinov2withNorm" # or "MAEwNorm"
+  encoder_config_path: "facebook/dinov2-with-registers-base"
+  encoder_input_size: 224
+  encoder_params:
+    dinov2_path: "facebook/dinov2-with-registers-base"
+    normalize: True
+  decoder_config_path: 'configs/decoder/ViTXL'
+  pretrained_decoder_path: "./pretrained/rae/dinov2_decoder.pt"
+  normalization_stat_path: "./pretrained/rae/dinov2_stats.pt"
+  reshape_to_2d: True
+  noise_tau: 0.0  
+  decoder_patch_size: 16
+
+model:
+  phase1_ckpt: "${work_dir}/phase1/DiLA_g_16_la_256_final.pt"
+  phase2_ckpt: "${work_dir}/phase2/DiLA_g_16_la_256_final.pt"
+  action_decoder_ckpt: null
+
+# Accelerator settings
+accelerator:
+  timeout_seconds: 60

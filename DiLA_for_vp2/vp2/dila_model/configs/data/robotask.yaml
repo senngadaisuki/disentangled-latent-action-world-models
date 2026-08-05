@@ -1,0 +1,9 @@
+use_multidataset: false
+root_dir: "./data/vp2/robosuite_frames"
+seq_len: ${seq_len}
+num_workers: ${num_workers}
+pin_memory: ${pin_memory}
+shuffle_train: ${shuffle_train}
+seed: ${seed}
+batch_size: ${batch_size}
+val_batch_size: ${val_batch_size}
